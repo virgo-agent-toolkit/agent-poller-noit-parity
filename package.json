@@ -1,0 +1,23 @@
+{
+  "name": "agent-poller-noit-parity",
+  "version": "0.0.0",
+  "description": "agent-poller-noit-parity ========================",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tests/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/virgo-agent-toolkit/agent-poller-noit-parity.git"
+  },
+  "author": "",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/virgo-agent-toolkit/agent-poller-noit-parity/issues"
+  },
+  "homepage": "https://github.com/virgo-agent-toolkit/agent-poller-noit-parity",
+  "dependencies": {
+    "depends-on": "0.0.2",
+    "tape": "^2.13.0"
+  }
+}
