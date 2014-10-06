@@ -23,6 +23,6 @@ RUN uuidgen
 
 RUN apt-get clean
 
-EXPOSE 32322 43191 8888
+EXPOSE 32322 43191 8888 80
 
 CMD ["/usr/bin/supervisord" ,"-c", "/etc/supervisor/conf.d/supervisord.conf"]
