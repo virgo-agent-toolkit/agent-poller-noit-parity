@@ -1,0 +1,36 @@
+{
+  "postgres": {
+    "cmd": ["docker", "run", "-i", "-t",  "-p", "5432:5432", "--name", "postgres", "-d", "nachiket/postgres"],
+    "wait_for": {
+      "host": "192.168.59.103",
+      "port": 5432,
+      "timeout": 20
+    },
+    "signal": "SIGKILL"
+
+  },
+  "noit_stratcon": {
+    "cmd": ["docker", "run", "-d", "-p", "32322:32322", "-p", "43191:43191", "-p", "8888:8888", "-p", "80:80", "-ti", "--link", "postgres:postgres", "--name", "noit", "nachiket/noit"],
+    "depends": ["postgres"],
+    "wait_for": {
+      "host": "192.168.59.103",
+      "port": 80,
+      "timeout": 20
+    },
+    "signal": "SIGKILL"
+  },
+  "kill_postgres": {
+    "cmd": ["docker", "kill", "postgres"]
+  },
+  "kill_noit_stratcon": {
+    "cmd": ["docker", "kill", "noit"]
+  },
+  "remove_postgres": {
+     "cmd": ["docker", "rm", "-f", "postgres"],
+     "depends": ["kill_postgres"]
+  },
+  "remove_noit": {
+     "cmd": ["docker", "rm", "-f", "noit"],
+     "depends": ["kill_noit_stratcon"]
+  }
+}
