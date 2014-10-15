@@ -38,6 +38,7 @@ test('test noit', function(t) {
 
 test('test journal', function(t) {
   http.get("http://" + ip + "/handoff/journals", function(res) {
+    t.ok(res);
     console.log("Got response: " + res.statusCode);
   }).on('error', function(e) {
     console.log("Got error: " + e.message);
