@@ -4,21 +4,36 @@
     "wait_for": {
       "host": "192.168.59.103",
       "port": 5432,
-      "timeout": 20
+      "timeout": 300
     },
     "signal": "SIGKILL"
 
   },
   "noit_stratcon": {
-    "cmd": ["docker", "run", "-d", "-p", "32322:32322", "-p", "43191:43191", "-p", "8888:8888", "-p", "80:80", "-ti", "--link", "postgres:postgres", "--name", "noit", "nachiket/noit"],
+    "cmd": ["docker", "run", "-d", "-p", "32322:32322", "-p", "43191:43191", "-p", "8888:8888", "-p", "80:80", "-ti", "--link", "postgres:postgres", "-v", "/var/log/stratcon.persist/127.0.0.1/noit-test/:/var/log/stratcon.persist/127.0.0.1/noit-test/", "--name", "noit", "nachiket/noit"],
     "depends": ["postgres"],
     "wait_for": {
       "host": "192.168.59.103",
       "port": 80,
-      "timeout": 20
+      "timeout": 300
     },
     "signal": "SIGKILL"
   },
+  "redis": {
+    "cmd": ["docker", "run", "-d", "--name", "redis", "-p", "6379:6379", "dockerfile/redis"],
+    "depends": ["noit_stratcon"],
+    "wait_for": {
+      "host": "192.168.59.103",
+      "port": 6379,
+      "timeout": 300
+    },
+    "signal": "SIGKILL"
+  },
+  "ingestor": {
+    "cmd": ["docker", "run", "-d", "--name", "ingestor", "--link", "redis:redis", "-v", "/var/log/stratcon.persist/127.0.0.1/noit-test/:/var/log/stratcon.persist/127.0.0.1/noit-test/", "--link", "noit:noit", "nachiket/stratcon_ingestor"],
+    "depends": ["redis"]
+  },  
+
   "kill_postgres": {
     "cmd": ["docker", "kill", "postgres"]
   },
@@ -32,5 +47,21 @@
   "remove_noit": {
      "cmd": ["docker", "rm", "-f", "noit"],
      "depends": ["kill_noit_stratcon"]
-  }
+  },
+  "kill_redis": {
+    "cmd": ["docker", "kill", "redis"],
+    "depends": ["kill_noit_stratcon"]
+  },
+  "remove_redis": {
+     "cmd": ["docker", "rm", "-f", "redis"],
+     "depends": ["kill_redis"]
+  },
+  "kill_ingestor": {
+    "cmd": ["docker", "kill", "ingestor"],
+    "depends": ["kill_redis"]
+  },
+  "remove_ingestor": {
+     "cmd": ["docker", "rm", "-f", "ingestor"],
+     "depends": ["kill_ingestor"]
+  } 
 }
