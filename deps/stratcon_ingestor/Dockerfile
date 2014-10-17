@@ -10,5 +10,5 @@ ADD stratcon_ingestor.js /data/stratcon_ingestor.js
 RUN npm install redis
 
 # Define default command.
-CMD node stratcon_ingestor.js
+CMD nodejs stratcon_ingestor.js
 

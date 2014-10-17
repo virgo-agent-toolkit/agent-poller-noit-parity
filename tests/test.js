@@ -15,7 +15,23 @@ var client = require('noit_client').NoitClient,
     r_client,
     noit_client,
     ip,
-    __dirname = '/var/log/stratcon.persist/127.0.0.1/noit-test/0/';  
+    __dirname = '/var/log/stratcon.persist/127.0.0.1/noit-test/0/',
+    CHECK_XML = '<?xml version="1.0" encoding="utf-8"?>' +
+                '<check>' +
+                '  <attributes>' +
+                '    <name>test</name>' +
+                '    <module>selfcheck</module>' +
+                '    <target>127.0.0.1</target>' +
+                '    <period>5000</period>' +
+                '    <timeout>4000</timeout>' +
+                '    <filterset>default</filterset>' +
+                '  </attributes>' +
+                '  <config>' +
+                '    <code>200</code>' +
+                '    <url>https://labs.omniti.com/</url>' +
+                '  </config>' +
+                '</check>',
+    CHECK_ID = 'edc4760b-5bdb-45d6-ab82-34160eda8187';      
 
 test('setup', ready);
 
@@ -41,20 +57,52 @@ test('test noit', function(t) {
   })
 });
 
+test('noit', function(t) {
+  noit_client.setSerializedCheck(CHECK_ID, CHECK_XML, function(err) {
+    t.error(err, "Set check should not error");
+    t.end();
+  });
+});
+
+test('test_check_test', function(t) {
+  noit_client.testSerializedCheck(CHECK_ID, CHECK_XML, function(err, result) {
+    t.error(err, "testCheck should not error");
+    t.ok(result.hasOwnProperty('metrics'), "testCheck should return metrics");
+    t.deepEqual(result.state, 'good', "testCheck should be of state good");
+    t.end();
+  });
+});
+
+test('getALL', function(t) {
+  noit_client.getAllChecks(function(err, result) {
+    t.error(err, "should not error");
+    t.ok(result);
+    t.end();
+  });
+});
+
+test('get newly created check', function(t) {
+  noit_client.getCheck(CHECK_ID,function(err, result) {
+    t.error(err, "should not error");
+    t.ok(result.indexOf(CHECK_ID) > -1);
+    t.end();
+  });
+});
+
 test('basic_ingestion', function(t) {
   async.series([
     function(callback) {
-      setTimeout(callback, 20000); // Sleep for sometime to let the journals start ingesting
+      setTimeout(callback, 50000); // Sleep for sometime to let the journals start ingesting
     },
     function(callback) {
       r_client = redis.createClient(6379, ip);
       r_client.on("connect", callback);
     },
     function(callback) {
-      r_client.hgetall("f7cea020-f19d-11dd-85a6-cb6d3a2207dc", function (err, data) {
+    	redis.debug_mode = true;
+      r_client.hgetall(CHECK_ID, function (err, data) {
         if (err) console.log('error', err);
         t.ok(data);
-        console.dir(data);
         r_client.end();
         t.end();
         callback;
