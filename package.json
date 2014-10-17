@@ -4,7 +4,7 @@
   "description": "agent-poller-noit-parity ========================",
   "main": "index.js",
   "scripts": {
-    "test": "node tests/index.js"
+    "test": "node tests/test.js"
   },
   "repository": {
     "type": "git",
@@ -17,7 +17,11 @@
   },
   "homepage": "https://github.com/virgo-agent-toolkit/agent-poller-noit-parity",
   "dependencies": {
-    "depends-on": "0.0.2",
-    "tape": "^2.13.0"
+    "depends-on": "^1.1.0",
+    "longjohn": "~0.2.2",
+    "tape": "^2.13.0",
+    "noit_client": "0.0.2",
+    "redis": "0.10.0",
+    "async": "0.9.0"
   }
 }
